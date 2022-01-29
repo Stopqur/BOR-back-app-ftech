@@ -54,10 +54,10 @@ exports.authUser = async(req, res) => {
   };
 };
 
-exports.getUsers = async (req, res) => {
+exports.getUser = async (req, res) => {
     try {
-        const users = await db.users.findAll({ raw: true })
-        res.json(users)
+        const user = await db.users.findOne({ where: {id: req.params.id} })
+        res.json(user)
     } catch(e) {
         res.status(400).json({ message: e })
     }

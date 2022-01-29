@@ -4,7 +4,7 @@ exports.createRecipe = async(req, res) => {
     try {
         const { title, description, cookingSteps, user_id } = req.body
         const img = req.file.path
-        const recipe = await db.recipes.create({ title, description, cookingSteps,user_id, img: img})
+        const recipe = await db.recipes.create({ title, description, cookingSteps, user_id, img: img })
         res.json(recipe)
     } catch(e) {
         res.status(400).json({ message: e})

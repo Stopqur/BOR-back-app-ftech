@@ -16,7 +16,7 @@ router.post(
 );
 
 router.post('/sign-in', authController.authUser);
-router.get('/users', accessAuthUser, authController.getUsers)
+router.get('/user/:id', accessAuthUser, authController.getUser)
 router.put('/user/:id', accessAuthUser, authController.updateUser)
 router.delete('/user/:id', accessAuthUser, authController.deleteUser)
 
