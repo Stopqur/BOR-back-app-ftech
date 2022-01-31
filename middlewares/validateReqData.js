@@ -1,4 +1,4 @@
-const validation = (schema) => async (req, res, next) => {
+const validateReqData = (schema) => async (req, res, next) => {
   const body = req.body
   try {
     await schema.validate(body)
@@ -8,4 +8,4 @@ const validation = (schema) => async (req, res, next) => {
   }
 }
 
-module.exports = validation
+module.exports = validateReqData

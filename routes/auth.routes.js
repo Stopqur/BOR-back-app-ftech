@@ -3,14 +3,14 @@ const express = require('express')
 const accessAuthUser = require("../middlewares/accessAuthUser");
 const checkDuplicate = require('../middlewares/checkDuplicate')
 const authController = require("../controllers/auth.controllers");
-const validation = require('../middlewares/validationReqData')
+const validateReqData = require('../middlewares/validateReqData')
 const userSchema = require('../validations/userValidation')
 
 const router = express.Router()
 
 router.post(
   '/sign-up',
-  validation(userSchema),
+  validateReqData(userSchema),
   checkDuplicate,
   authController.createUser
 );

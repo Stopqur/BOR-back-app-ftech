@@ -1,7 +1,7 @@
 const CryptoJS = require("crypto-js")
 const jwt = require("jsonwebtoken");
 
-const db = require("../models");
+const db = require("../db/models");
 const config = require("../config/auth.config");
 
 exports.createUser = async(req, res) => {

@@ -1,8 +1,8 @@
 const express =  require('express')
 const cors = require('cors')
 
-const db = require('./models')
-const indexRouter = require('./routes/index.router')
+const db = require('./db/models')
+const router = require('./routes')
 
 const app = express()
 const corsSetting = {
@@ -19,7 +19,7 @@ app.use('', (req, res, next) => {
   next();
 });
 
-app.use('/api', indexRouter)
+app.use('/api', router)
 
 db.sequelize.sync();
-app.listen(5000, () => { console.log('working')})
+app.listen(5000, () => { console.log('Server has been started on port 5000')})
