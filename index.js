@@ -1,7 +1,8 @@
 const express =  require('express')
 const cors = require('cors')
+const path = require('path')
 
-const db = require('./db/models')
+const db = require('./models')
 const router = require('./routes')
 
 const app = express()
@@ -18,7 +19,7 @@ app.use('', (req, res, next) => {
   );
   next();
 });
-
+app.use(express.static(path.resolve(__dirname, 'images')))
 app.use('/api', router)
 
 db.sequelize.sync();

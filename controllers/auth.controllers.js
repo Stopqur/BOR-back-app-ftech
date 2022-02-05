@@ -1,21 +1,29 @@
 const CryptoJS = require("crypto-js")
 const jwt = require("jsonwebtoken");
 
-const db = require("../db/models");
+const db = require("../models");
 const config = require("../config/auth.config");
 
 exports.createUser = async(req, res) => {
-    try {
-        await db.users.create({
-            username: req.body.username,
-            email: req.body.email,
-            password: CryptoJS.AES.encrypt(req.body.password, 'secret key 123').toString(),
-            dob: req.body.dob
-        })
-        res.send({ message: "User was registered successfully!" })
-    } catch(err) {
-        res.status(500).send({ message: err.message });
-    }
+  try {
+    const user = await db.users.create({
+      username: req.body.username,
+      email: req.body.email,
+      password: CryptoJS.AES.encrypt(req.body.password, 'secret key 123').toString(),
+      dob: req.body.dob
+    })
+    const token = jwt.sign({ id: user.id }, config.secret, {
+      expiresIn: 43200
+    })
+    res.status(200).json({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      accessToken: token
+    })
+  } catch(err) {
+    res.status(500).send({ message: err.message });
+  }
 };
 
 exports.authUser = async(req, res) => {
@@ -30,8 +38,7 @@ exports.authUser = async(req, res) => {
       return res.status(404).send({ message: "User is Not found." });
     }
     
-    const decryptPassword = CryptoJS.AES.decrypt(user.password, 'secret key 123')
-          .toString(CryptoJS.enc.Utf8)
+    const decryptPassword = CryptoJS.AES.decrypt(user.password, 'secret key 123').toString(CryptoJS.enc.Utf8)
   
     if (decryptPassword !== req.body.password) {
       return res.status(401).send({
@@ -43,6 +50,7 @@ exports.authUser = async(req, res) => {
     const token = jwt.sign({ id: user.id }, config.secret, {
         expiresIn: 43200
     });
+    
     res.status(200).json({
         id: user.id,
         username: user.username,
@@ -55,12 +63,12 @@ exports.authUser = async(req, res) => {
 };
 
 exports.getUser = async (req, res) => {
-    try {
-        const user = await db.users.findOne({ where: {id: req.params.id} })
-        res.json(user)
-    } catch(e) {
-        res.status(400).json({ message: e })
-    }
+  try {
+    const user = await db.users.findOne({ where: {id: req.params.id} })
+    res.json(user)
+  } catch(e) {
+    res.status(400).json({ message: e })
+  }
 }
 
 exports.updateUser = async (req, res) => {
