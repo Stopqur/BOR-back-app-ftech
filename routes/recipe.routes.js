@@ -11,17 +11,20 @@ const { createRecipe,
   filterSortRecipes
 } = require('../controllers/recipe.controller')
 
+const userRecipes = require('./userRecipe.routes')
+
 const imgMiddleware = require('../middlewares/imgMiddleware')
 
 const router = express.Router()
 
 router.post('/new', imgMiddleware.single('img'), createRecipe)
 router.get('/', getRecipes)
-router.get('/user/:id', getUserRecipes)
-router.get('/get', filterSortRecipes)
+router.use('/user', userRecipes)
+// router.get('/user/:id', getUserRecipes)
+router.get('/by', filterSortRecipes)
 router.get('/:id', getOneRecipe)
 router.put('/:id', updateRecipe)
-router.delete('/:id', deleteRecipe)
+// router.delete('/user/:id', deleteRecipe)
 router.post('/', createWishRecipe)
 
 

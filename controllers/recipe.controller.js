@@ -1,13 +1,16 @@
 const db = require('../models')
+const { Op } = require("sequelize");
+
 
 exports.createRecipe = async(req, res) => {
+  console.log('!!!!!!!!!!!!!!!!!!!!!!!')
   try {
     if(!req.body.title) {
       const img = req.file.filename
       res.json({img})
     } else {
-      const { title, description, cookingSteps, user_id, img, complexity} = req.body
-      const recipe = await db.recipes.create({ title, description, user_id, img, complexity })
+      const { title, description, cookingSteps, user_id, img, complexity, cookingTime} = req.body
+      const recipe = await db.recipes.create({ title, description, user_id, img, complexity, cookingTime })
       const steps = cookingSteps.map(async item => {
         await db.cookingSteps.create({name: item.name, recipe_id: recipe.id})
       })
@@ -29,7 +32,8 @@ exports.getRecipes = async (req, res) => {
 
 exports.getUserRecipes = async(req, res) => {
   try {
-    const recipes = await db.recipes.findAll({ where: {user_id: req.params.id}})
+    console.log(req.params.id)
+    const recipes = await db.recipes.findAll({ where: {user_id: req.params.id}, include: [db.cookingSteps.name]})
     res.json(recipes)
   } catch(e) {
     res.status(400).json({message: e})
@@ -59,11 +63,15 @@ exports.updateRecipe = async (req, res) => {
 
 exports.deleteRecipe = async (req, res) => {
   try {
-    const recipe = await db.recipes.findOne({ where: { id: req.params.id}, include: [db.cookingSteps.name]})
+    console.log(req.params.id)
+    const recipe = await db.recipes.findOne({ where: { id: req.query.recipeId}})
     const steps = await db.cookingSteps.findAll({where: {recipe_id: recipe.id}})
-    steps.destroy()
+    steps.map(async(step) => {
+      await step.destroy()
+    })
     recipe.destroy()
-    res.json(recipe)
+    const userRecipes = await db.recipes.findAll( {include: [db.cookingSteps.name]})
+    res.json(userRecipes)
   } catch(e) {
     res.status(400).json({ message: "Recipe was not deleted!"})
   }
@@ -72,7 +80,7 @@ exports.deleteRecipe = async (req, res) => {
 exports.getWishRecipes = async (req, res) => {
   try {
     const user = await db.users.findOne({where: {id: req.params.id}})
-    const wishRecipes = await user.getRecipe()
+    const wishRecipes = await user.getRecipe({include: [db.cookingSteps.name]})
     res.json(wishRecipes)
   } catch(e) {
     res.status(400).json({message: e})
@@ -96,24 +104,48 @@ exports.createWishRecipe = async (req, res) => {
 }
 
 exports.filterSortRecipes = async (req, res) => {
+  console.log(req.query)
+  let obj = {}
+  
+  for(let [paramName, paramValue] of Object.entries(req.query)) {
+    if(Array.isArray(paramValue) && paramName === 'complexity') {
+      obj.where = {}
+      obj.order = []
+      obj.order[Op.or] = []
+      obj.where.complexity = {}
+      // paramValue.map(item => {
+      //   if(item === 'ASC' || item === 'DESC') {
+      //     obj.order = [[paramName, item]]
+      //   } else {
+      //     console.log(item)
+      //     obj.where.complexity[Op.between] = [item[0], item[2]]
+      //   }
+      // })
+      obj.where.complexity[Op.between] = [paramValue[0], paramValue[1]]
+
+    }
+    else if(paramName === 'complexity' && req.query.complexity !== 'ASC' && req.query.complexity !== 'DESC') {
+      obj.where = {}
+      obj.where.complexity = {}
+      obj.where.complexity[Op.between] = [paramValue[0], paramValue[2]]
+    }
+    else if (paramName === 'cookingTime') {
+      console.log('param!!!!!!!!!Value', paramValue)
+      obj.where = {}
+      obj.where.cookingTime = {}
+      obj.where.cookingTime[Op.between] = [paramValue[0], paramValue[1]]
+    }
+    else if(paramName === 'title' || paramName === 'createdAt' || (paramName === 'complexity')) {  
+      console.log('2424242')
+      obj.order = []
+      obj.order[Op.or] = []
+      obj.order = [[paramName, paramValue]]
+    }
+  }
+  console.log(obj)
   try {
-    if(req.query.complexity) {
-      if(req.query.complexity !== 'ASC' && req.query.complexity !=='DESC') {
-        const filterRecipes = await db.recipes.findAll({ where: {complexity: req.query.complexity}})
-        res.json(filterRecipes)
-      } else {
-        const sortRecipes = await db.recipes.findAll({ order: [['complexity', req.query.complexity]]})
-        res.json(sortRecipes)
-      }
-    }
-    else if (req.query.title) {
-      const sortRecipes = await db.recipes.findAll({order: [['title', req.query.title]]})
-      res.json(sortRecipes)
-    }
-    else if (req.query.created) {
-      const sortRecipes = await db.recipes.findAll({ order: [['createdAt', req.query.created]]})
-      res.json(sortRecipes)
-    }
+    const sortRecipes = await db.recipes.findAll(obj)
+    res.json(sortRecipes)
   } catch(e) {
     res.status(400).json({'Querymessage': e})
   }
