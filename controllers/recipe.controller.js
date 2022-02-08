@@ -104,7 +104,6 @@ exports.createWishRecipe = async (req, res) => {
 }
 
 exports.filterSortRecipes = async (req, res) => {
-  console.log(req.query)
   let obj = {}
   
   for(let [paramName, paramValue] of Object.entries(req.query)) {
@@ -113,14 +112,6 @@ exports.filterSortRecipes = async (req, res) => {
       obj.order = []
       obj.order[Op.or] = []
       obj.where.complexity = {}
-      // paramValue.map(item => {
-      //   if(item === 'ASC' || item === 'DESC') {
-      //     obj.order = [[paramName, item]]
-      //   } else {
-      //     console.log(item)
-      //     obj.where.complexity[Op.between] = [item[0], item[2]]
-      //   }
-      // })
       obj.where.complexity[Op.between] = [paramValue[0], paramValue[1]]
 
     }
@@ -130,19 +121,16 @@ exports.filterSortRecipes = async (req, res) => {
       obj.where.complexity[Op.between] = [paramValue[0], paramValue[2]]
     }
     else if (paramName === 'cookingTime') {
-      console.log('param!!!!!!!!!Value', paramValue)
       obj.where = {}
       obj.where.cookingTime = {}
       obj.where.cookingTime[Op.between] = [paramValue[0], paramValue[1]]
     }
     else if(paramName === 'title' || paramName === 'createdAt' || (paramName === 'complexity')) {  
-      console.log('2424242')
       obj.order = []
       obj.order[Op.or] = []
       obj.order = [[paramName, paramValue]]
     }
   }
-  console.log(obj)
   try {
     const sortRecipes = await db.recipes.findAll(obj)
     res.json(sortRecipes)
