@@ -3,9 +3,8 @@ const express = require('express')
 const { createRecipe, 
   getRecipes, 
   updateRecipe, 
-  getOneRecipe, 
   createWishRecipe,
-  filterSortRecipes
+  updateRecipeImg
 } = require('../controllers/recipe.controller')
 
 const userRecipes = require('./userRecipe.routes')
@@ -14,12 +13,11 @@ const imgMiddleware = require('../middlewares/imgMiddleware')
 
 const router = express.Router()
 
-router.post('/new', imgMiddleware.single('img'), createRecipe)
-router.get('/', getRecipes)
 router.use('/user', userRecipes)
-router.get('/by', filterSortRecipes)
-router.get('/:id', getOneRecipe)
-router.put('/:id', updateRecipe)
+router.post('/new', imgMiddleware.single('img'), createRecipe)
 router.post('/', createWishRecipe)
+router.get('/', getRecipes)
+router.put('/new', updateRecipeImg)
+router.put('/:id', updateRecipe)
 
 module.exports = router

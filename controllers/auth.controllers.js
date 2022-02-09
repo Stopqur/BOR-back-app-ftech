@@ -63,7 +63,7 @@ exports.authUser = async(req, res) => {
 };
 
 exports.getUser = async (req, res) => {
-  try {
+    try {
     const user = await db.users.findOne({ where: {id: req.params.id} })
     res.json(user)
   } catch(e) {
