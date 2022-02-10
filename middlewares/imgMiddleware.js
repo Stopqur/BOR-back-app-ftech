@@ -1,21 +1,25 @@
-const multer = require('multer')
-const uuid = require('uuid')
+const multer = require('multer');
+const uuid = require('uuid');
 
 const storage = multer.diskStorage({
   destination(req, file, cb) {
-    cb(null, 'images/')
+    cb(null, 'images/');
   },
   filename(req, file, cb) {
-    cb(null, uuid.v4().toString() + '-' + file.originalname)
-  }
-})
+    cb(null, `${uuid.v4().toString()}-${file.originalname}`);
+  },
+});
 
 const fileFilter = (req, file, cb) => {
-  if(file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg') {
-    cb(null, true)
+  if (
+    file.mimetype === 'image/png' ||
+    file.mimetype === 'image/jpg' ||
+    file.mimetype === 'image/jpeg'
+  ) {
+    cb(null, true);
   } else {
-    cb(null, false)
+    cb(null, false);
   }
-}
+};
 
-module.exports = multer({ storage, fileFilter })
+module.exports = multer({ storage, fileFilter });

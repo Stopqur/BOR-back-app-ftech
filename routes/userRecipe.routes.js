@@ -1,10 +1,13 @@
-const express = require('express')
+const express = require('express');
 
-const { getRecipes, deleteRecipe } = require('../controllers/recipe.controller')
+const {
+  getRecipes,
+  deleteRecipe,
+} = require('../controllers/recipe.controller');
 
-const router = express.Router()
+const router = express.Router();
 
-router.get('/:id', getRecipes)
-router.delete('/:id/', deleteRecipe)
+router.get('/:id', getRecipes);
+router.delete('/:id/', deleteRecipe);
 
-module.exports = router
+module.exports = router;

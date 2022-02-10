@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('cookingSteps', {
@@ -7,7 +5,7 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       name: {
         type: Sequelize.STRING,
@@ -19,22 +17,22 @@ module.exports = {
         onDelete: 'CASCADE',
         references: {
           model: 'recipes',
-          key: 'id'
-        }
+          key: 'id',
+        },
       },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        default: new Date()
+        default: new Date(),
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        default: new Date()
-      }
+        default: new Date(),
+      },
     });
   },
-  down: async (queryInterface, Sequelize) => {
+  down: async (queryInterface) => {
     await queryInterface.dropTable('cookingSteps');
-  }
+  },
 };

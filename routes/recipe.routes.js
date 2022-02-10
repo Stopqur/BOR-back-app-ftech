@@ -1,23 +1,24 @@
-const express = require('express')
+const express = require('express');
 
-const { createRecipe, 
-  getRecipes, 
-  updateRecipe, 
+const {
+  createRecipe,
+  getRecipes,
+  updateRecipe,
   createWishRecipe,
-  updateRecipeImg
-} = require('../controllers/recipe.controller')
+  updateRecipeImg,
+} = require('../controllers/recipe.controller');
 
-const userRecipes = require('./userRecipe.routes')
+const userRecipes = require('./userRecipe.routes');
 
-const imgMiddleware = require('../middlewares/imgMiddleware')
+const imgMiddleware = require('../middlewares/imgMiddleware');
 
-const router = express.Router()
+const router = express.Router();
 
-router.use('/user', userRecipes)
-router.post('/new', imgMiddleware.single('img'), createRecipe)
-router.post('/', createWishRecipe)
-router.get('/', getRecipes)
-router.put('/new', updateRecipeImg)
-router.put('/:id', updateRecipe)
+router.use('/user', userRecipes);
+router.post('/new', imgMiddleware.single('img'), createRecipe);
+router.post('/', createWishRecipe);
+router.get('/', getRecipes);
+router.put('/new', updateRecipeImg);
+router.put('/:id', updateRecipe);
 
-module.exports = router
+module.exports = router;
